@@ -33,18 +33,19 @@ Isaac Lab offers a comprehensive set of tools and environments designed to facil
 1. SSH into WatCloud and git clone this repo
    - Reference: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev/
    - Use wato_asd_tooling repo to start ssh session in the slurm nodes (See link: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev#one-time-setup) (See link for minimum spec on slurm nodes: https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html)
-- In `IsaacLab/docker/.container.cfg` set `x_11_forwarding_enabled = 0`
-- On a new terminal, run `ssh -L 5900:localhost:5900 asd-dev-session` to enable ssh tunneling from slurm nodes to local computer
-- Run
+2. After SSH and git clone, in `IsaacLab/docker/.container.cfg` set `x_11_forwarding_enabled = 0`
+3. On a new terminal, run `ssh -L 5900:localhost:5900 asd-dev-session` to enable ssh tunneling from slurm nodes to local computer
+4. Run the following on watcloud terminal to start IsaacLab container
 ```
 cd IsaacLab \
 && export DISPLAY=:1 \
 && ./docker/container.py start \
 && ./docker/container.py enter base
 ```
-- Launch Isaac Lab by running `./isaaclab.sh -s` OR Run a script with `./isaaclab.sh -p <path_to_file>`
-- Download VNC Viewer and choose localhost:5900 to open Isaac Lab (See link: https://www.realvnc.com/en/connect/download/viewer/?lai_vid=63V0dbyEai1ON&lai_sr=5-9&lai_sl=l&lai_p=1)
+5. Launch Isaac Lab by running `./isaaclab.sh -s` OR Run a script with `./isaaclab.sh -p <path_to_file>`
+6. Download VNC Viewer and choose localhost:5900 to open Isaac Lab (See link: https://www.realvnc.com/en/connect/download/viewer/?lai_vid=63V0dbyEai1ON&lai_sr=5-9&lai_sl=l&lai_p=1)
 
+**Others**
 Our [documentation page](https://isaac-sim.github.io/IsaacLab) provides everything you need to get started, including detailed tutorials and step-by-step guides. Follow these links to learn more about:
 
 - [Installation steps](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html#local-installation)
