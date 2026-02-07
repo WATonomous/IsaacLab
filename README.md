@@ -32,7 +32,8 @@ Isaac Lab offers a comprehensive set of tools and environments designed to facil
 **On WatCloud:**
 1. SSH into WatCloud and git clone this repo
    - Reference: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev/
-   - Use wato_asd_tooling repo to start ssh session in the slurm nodes (See link: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev#one-time-setup) (See link for minimum spec on slurm nodes: https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html)
+   - You need to be able to ssh into login nodes like `ssh wato-login1` and also configure for ssh into slurm nodes with spec that satisfy the Isaac Lab requirement via confiiguring `session_config.sh` (See link for minimum spec on slurm nodes: https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html)
+   - Use wato_asd_tooling repo to start ssh session in the slurm nodes (See link: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev#one-time-setup)
 2. After SSH and git clone, in `IsaacLab/docker/.container.cfg` set `x_11_forwarding_enabled = 0`
 3. On a new terminal, run `ssh -L 5900:localhost:5900 asd-dev-session` to enable ssh tunneling from slurm nodes to local computer
 4. Run the following on watcloud terminal to start IsaacLab container
