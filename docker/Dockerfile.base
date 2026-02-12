@@ -104,7 +104,10 @@ RUN touch /bin/nvidia-smi && \
 # installing Isaac Lab dependencies
 # use pip caching to avoid reinstalling large packages
 RUN --mount=type=cache,target=${DOCKER_USER_HOME}/.cache/pip \
-    ${ISAACLAB_PATH}/isaaclab.sh --install
+    ${ISAACLAB_PATH}/isaaclab.sh --install && \
+    ${ISAACLAB_PATH}/_isaac_sim/python.sh -m pip uninstall -y numpy && \
+    ${ISAACLAB_PATH}/_isaac_sim/python.sh -m pip install numpy==1.26.4
+
 
 # aliasing isaaclab.sh and python for convenience
 RUN echo "export ISAACLAB_PATH=${ISAACLAB_PATH}" >> ${HOME}/.bashrc && \

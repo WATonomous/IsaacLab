@@ -96,7 +96,7 @@ services:
     # This is the entrypoint for the container
     entrypoint: >
       bash -c "
-      Xvfb :1 -screen 0 1280x1024x24 -auth /tmp/.Xauthority &
+      Xvfb :1 -screen 0 ${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}x${DISPLAY_DEPTH} -auth /tmp/.Xauthority &
       x11vnc -display :1 -auth /tmp/.Xauthority -nopw -forever -shared &
       startlxde &
       bash"
@@ -129,7 +129,7 @@ services:
     # This is the entrypoint for the container
     entrypoint: >
       bash -c "
-      Xvfb :1 -screen 0 1280x1024x24 -auth /tmp/.Xauthority &
+      Xvfb :1 -screen 0 ${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}x${DISPLAY_DEPTH} -auth /tmp/.Xauthority &
       x11vnc -display :1 -auth /tmp/.Xauthority -nopw -forever -shared &
       startlxde &
       bash"
