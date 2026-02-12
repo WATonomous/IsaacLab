@@ -50,16 +50,14 @@ RUN --mount=type=cache,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 # VNC dependencies
-RUN apt-get update -y && apt-get install -y \
-    supervisor \
-    x11vnc \
-    xvfb \
-    mesa-utils \
-    x11-apps \
-    lxde \
-    && apt-get purge -y light-locker \
-    && apt-get -y autoremove && apt-get clean autoclean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y
+RUN apt-get install -y supervisor
+RUN apt-get install -y x11vnc
+RUN apt-get install -y xvfb
+RUN apt-get install -y mesa-utils
+RUN apt-get install -y x11-apps
+RUN apt-get purge -y light-locker
+RUN apt-get install -y lxde
 
 # Set up VNC
 COPY --chown=${USER} docker/supervisord.conf /etc/supervisor/supervisord.conf
