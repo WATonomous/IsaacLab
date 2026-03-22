@@ -83,7 +83,8 @@ with open(p, "w") as f:
     json.dump(d, f, indent=4)
 
 print("Patched:", p)
-EOF```
+EOF
+```
 
 Then run this command as well - ```echo 'rtx.verifyDriverVersion.enabled = false' >> /workspace/isaaclab/apps/isaaclab.python.rendering.kit```
 
