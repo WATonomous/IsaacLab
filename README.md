@@ -96,7 +96,7 @@ Our [documentation page](https://isaac-sim.github.io/IsaacLab) provides everythi
 - [Available environments](https://isaac-sim.github.io/IsaacLab/main/source/overview/environments.html)
 
 # Session Config - Use these recommended configurations for getting into IsaacLab
-
+```
 export REMOTE_USER=""    # Your WATcloud Username
 export REMOTE_HOST="wato-login1"      # [wato-login1, wato-login2]
 export SSH_KEY="~/.ssh/id_ed25519"           # Path to your local private key
@@ -111,6 +111,7 @@ export SAVE_DOCKER_STATE_ON_EXIT=1 # Set to 1 if you want to save docker state o
 export CLEAN_SAVED_DOCKER_STATE=0 # Set to 1 to clean your docker state, do this is your docker is corrupted or too large
 
 rijul_chaddha@trpro-slurm1:~/IsaacLab$
+```
 ## Contributing to Isaac Lab
 
 We wholeheartedly welcome contributions from the community to make this framework mature and useful for everyone.
