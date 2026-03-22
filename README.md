@@ -30,23 +30,63 @@ Isaac Lab offers a comprehensive set of tools and environments designed to facil
 ## Getting Started
 
 **On WatCloud:**
-1. SSH into WatCloud and git clone this repo
-   - Reference: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev/
-   - You need to be able to ssh into login nodes like `ssh wato-login1` and also configure for ssh into slurm nodes with spec that satisfy the Isaac Lab requirement via confiiguring `session_config.sh` (See link for minimum spec on slurm nodes: https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html)
-   - Use wato_asd_tooling repo to start ssh session in the slurm nodes (See link: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev#one-time-setup)
-2. After SSH and git clone, in `IsaacLab/docker/.container.cfg` set `x_11_forwarding_enabled = 0`
-3. On a new terminal, run `ssh -L 5900:localhost:5900 asd-dev-session` to enable ssh tunneling from slurm nodes to local computer
-4. Run the following on watcloud terminal to start IsaacLab container
+- SSH into WatCloud and git clone this repo
+- Use wato_asd_tooling repo to start ssh session in the slurm nodes (See link: https://wiki.watonomous.ca/autonomous_software_general/watcloud_dev#one-time-setup) (See link for minimum spec on slurm nodes: https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html)
+- In `IsaacLab/docker/.container.cfg` set `x_11_forwarding_enabled = 0`
+- On a new terminal, run `ssh -L 5900:localhost:5900 asd-dev-session` to enable ssh tunneling from slurm nodes to local computer
+- Run
 ```
 cd IsaacLab \
 && export DISPLAY=:1 \
+&& srun --cpus-per-task 8 --mem 64G --gres shard:24084,tmpdisk:102400 --time 4:00:00 --pty bash
+&& slurm-start-dockerd.sh
 && ./docker/container.py start \
 && ./docker/container.py enter base
 ```
-5. Launch Isaac Lab by running `./isaaclab.sh -s` OR Run a script with `./isaaclab.sh -p <path_to_file>`
-6. Download VNC Viewer and choose localhost:5900 to open Isaac Lab (See link: https://www.realvnc.com/en/connect/download/viewer/?lai_vid=63V0dbyEai1ON&lai_sr=5-9&lai_sl=l&lai_p=1)
 
-**Others**
+- Launch Isaac Lab by running `./isaaclab.sh -s` OR Run a script with `./isaaclab.sh -p <path_to_file>`
+- Download VNC Viewer and choose localhost:5900 to open Isaac Lab (See link: https://www.realvnc.com/en/connect/download/viewer/?lai_vid=63V0dbyEai1ON&lai_sr=5-9&lai_sl=l&lai_p=1)
+# Issues
+If there are issues with seeing display, try running these commands in the docker container -
+```
+pkill -f Xvfb
+pkill -f x11vnc
+pkill -f startlxde
+rm -f /tmp/.X1-lock
+rm -rf /tmp/.X11-unix/X1
+rm -f /tmp/.Xauthority
+touch /tmp/.Xauthority
+xauth add :1 . $(mcookie)
+Xvfb :1 -screen 0 1280x1024x24 -auth /tmp/.Xauthority -ac &
+export DISPLAY=:1
+x11vnc -display :1 -auth /tmp/.Xauthority -nopw -forever -shared &
+startlxde &
+sleep 5
+xclock &
+```
+
+For any driver issues, try running these commands to temporarily ignore the warnings -
+
+Find the driver checkers with this commander - ```find / -name "user.config.json" 2>/dev/null```
+And patch them individually like this -
+```python3 - << 'EOF'
+import json
+#Replace the line with your config files
+p = "/root/.local/share/ov/data/Kit/Isaac-Sim Full/4.5/user.config.json"
+
+with open(p, "r") as f:
+    d = json.load(f)
+
+d.setdefault("rtx", {})["verifyDriverVersion"] = {"enabled": False}
+
+with open(p, "w") as f:
+    json.dump(d, f, indent=4)
+
+print("Patched:", p)
+EOF```
+
+Then run this command as well - ```echo 'rtx.verifyDriverVersion.enabled = false' >> /workspace/isaaclab/apps/isaaclab.python.rendering.kit```
+
 Our [documentation page](https://isaac-sim.github.io/IsaacLab) provides everything you need to get started, including detailed tutorials and step-by-step guides. Follow these links to learn more about:
 
 - [Installation steps](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html#local-installation)
@@ -116,3 +156,23 @@ Isaac Lab development initiated from the [Orbit](https://isaac-orbit.github.io/)
    doi={10.1109/LRA.2023.3270034}
 }
 ```
+#Session Config - Use these configurations for getting into IsaacLab
+
+########### Session Config #########
+# Variables for SSH and remote execution
+export REMOTE_USER=""    # Your WATcloud Username
+export REMOTE_HOST="wato-login1"      # [wato-login1, wato-login2]
+export SSH_KEY="~/.ssh/id_ed25519"           # Path to your local private key
+
+# SLURM job configuration
+export NUMBER_OF_CPUS=8        # Number of CPUs to use
+export MEMORY=64G              # Amount of RAM to use
+export USAGE_TIME="6:00:00"    # How long you want to run the session for
+export TMP_DISK_SIZE=102400     # How much temporary storage you want [in MiB]
+export VRAM=24000                  # How much GPU VRAM you want [in MiB]
+# SLURM tooling configuration
+export UPDATE_WATO_ASD_TOOLING=0 # Set to 0 if you don't want to update ASD tooling on remote hosts
+export SAVE_DOCKER_STATE_ON_EXIT=1 # Set to 1 if you want to save docker state on exit
+export CLEAN_SAVED_DOCKER_STATE=0 # Set to 1 to clean your docker state, do this is your docker is corrupted or too large
+
+rijul_chaddha@trpro-slurm1:~/IsaacLab$
