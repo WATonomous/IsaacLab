@@ -115,7 +115,7 @@ class EventCfg:
 
 @configclass
 class CartpoleEnvCfg(ManagerBasedEnvCfg):
-    """Configuration for the cartpole environment."""
+    """Configuration for the cartpole environment. """
 
     # Scene settings
     scene = CartpoleSceneCfg(num_envs=1024, env_spacing=2.5)
@@ -130,7 +130,7 @@ class CartpoleEnvCfg(ManagerBasedEnvCfg):
         self.viewer.eye = [4.5, 0.0, 6.0]
         self.viewer.lookat = [0.0, 0.0, 2.0]
         # step settings
-        self.decimation = 4  # env step every 4 sim steps: 200Hz / 4 = 50Hz
+    self.decimation = 4  # env step every 4 sim steps: 200Hz / 4 = 50Hz
         # simulation settings
         self.sim.dt = 0.005  # sim step every 5ms: 200Hz
 

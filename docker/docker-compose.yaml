@@ -38,6 +38,9 @@ x-default-isaac-lab-volumes: &default-isaac-lab-volumes
     source: ../source
     target: ${DOCKER_ISAACLAB_PATH}/source
   - type: bind
+    source: ../../humanoid
+    target: /workspace/humanoid
+  - type: bind
     source: ../docs
     target: ${DOCKER_ISAACLAB_PATH}/docs
   - type: bind
@@ -62,6 +65,9 @@ x-default-isaac-lab-environment: &default-isaac-lab-environment
   - ISAACSIM_PATH=${DOCKER_ISAACLAB_PATH}/_isaac_sim
   - OMNI_KIT_ALLOW_ROOT=1
   - DISPLAY=:1.0
+  # Ensure container receives host graphics/Vulkan driver stack, not compute-only.
+  - NVIDIA_VISIBLE_DEVICES=all
+  - NVIDIA_DRIVER_CAPABILITIES=all
 
 x-default-isaac-lab-deploy: &default-isaac-lab-deploy
   resources:
@@ -92,7 +98,7 @@ services:
     network_mode: bridge
     deploy: *default-isaac-lab-deploy
     ports:
-      - "5900:5900"
+      - "5901:5900"
     # This is the entrypoint for the container
     entrypoint: >
       bash -c "
@@ -125,7 +131,7 @@ services:
     network_mode: bridge
     deploy: *default-isaac-lab-deploy
     ports:
-      - "5900:5900"
+      - "5901:5900"
     # This is the entrypoint for the container
     entrypoint: >
       bash -c "

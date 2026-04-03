@@ -64,7 +64,7 @@ class ActionsCfg:
 
 @configclass
 class ObservationsCfg:
-    """Observation specifications for the MDP."""
+    """Observation specifications for the MDP ."""
 
     @configclass
     class PolicyCfg(ObsGroup):
