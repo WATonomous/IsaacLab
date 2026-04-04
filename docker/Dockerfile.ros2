@@ -1,4 +1,10 @@
-FROM isaac-lab-base AS ros2
+# Everything past this stage is to install
+# ROS2 Humble
+
+# What is the docker name suffix for the base image to load? (defaults to empty string)
+ARG DOCKER_NAME_SUFFIX=""
+
+FROM isaac-lab-base${DOCKER_NAME_SUFFIX} AS ros2
 
 ARG ROS2_APT_PACKAGE=desktop
 ENV ISAACLAB_PATH=/workspace/isaaclab
@@ -43,4 +49,3 @@ RUN chmod +x ${ISAACLAB_PATH}/isaaclab.sh && \
 RUN apt-get -y autoremove && apt-get clean autoclean && rm -rf /var/lib/apt/lists/*
 
 RUN echo "source /opt/ros/humble/setup.bash" >> ${DOCKER_USER_HOME}/.bashrc
-

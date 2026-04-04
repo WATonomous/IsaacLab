@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# Copyright (c) 2022-2026, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -36,6 +36,7 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import math
+
 import torch
 
 import isaaclab.envs.mdp as mdp
@@ -140,6 +141,7 @@ def main():
     # parse the arguments
     env_cfg = CartpoleEnvCfg()
     env_cfg.scene.num_envs = args_cli.num_envs
+    env_cfg.sim.device = args_cli.device
     # setup base environment
     env = ManagerBasedEnv(cfg=env_cfg)
 
