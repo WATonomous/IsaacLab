@@ -38,6 +38,55 @@ Isaac Lab offers a comprehensive set of tools and environments designed to facil
 
 ## Getting Started
 
+### WatCloud + TurboVNC
+
+For WatCloud / Slurm usage, the simplest interactive workflow is:
+
+1. Install TurboVNC Viewer on your local machine.
+2. Start your Slurm dev session so `asd-dev-session` lands on the active compute node.
+3. Forward local port `5900` to the Slurm node through `asd-dev-session`: `ssh -L 5900:localhost:5901 asd-dev-session`
+4. Connect TurboVNC Viewer to `localhost:5900`.
+
+Minimal commands on the Slurm node:
+
+```bash
+cd ~/IsaacLab
+./docker/container.py build
+./docker/container.py start
+./docker/container.py enter base
+```
+
+Inside the container, run Isaac Lab as usual:
+
+```bash
+./isaaclab.sh -s
+```
+
+or run a script:
+
+```bash
+./isaaclab.sh -p <path_to_script.py>
+```
+
+On your local machine, open the SSH tunnel:
+
+```bash
+ssh -L 5900:localhost:5900 asd-dev-session
+```
+
+Then open TurboVNC Viewer and connect to:
+
+```text
+localhost:5900
+```
+
+Notes:
+
+- The container now starts TurboVNC automatically.
+- The default remote desktop resolution is `1280x720`.
+- If the viewer connects but Isaac is not visible yet, enter the container and start Isaac using `./isaaclab.sh -s`.
+- If you change Docker or VNC startup files, rebuild the image before restarting the container.
+
 ### Documentation
 
 Our [documentation page](https://isaac-sim.github.io/IsaacLab) provides everything you need to get started, including

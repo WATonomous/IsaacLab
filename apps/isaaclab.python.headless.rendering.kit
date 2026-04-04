@@ -50,12 +50,16 @@ isaac.startup.ros_bridge_extension = ""
 # Disabling these settings reduces renderer VRAM usage and improves rendering performance, but at some quality cost
 rtx.translucency.enabled = false
 rtx.reflections.enabled = false
+rtx.reflections.denoiser.enabled = false
 rtx.indirectDiffuse.enabled = false
+rtx.indirectDiffuse.denoiser.enabled = false
 rtx-transient.dlssg.enabled = false
-rtx.directLighting.sampledLighting.enabled = true
-rtx.directLighting.sampledLighting.samplesPerPixel = 1
+rtx-transient.dldenoiser.enabled = false
+rtx.directLighting.sampledLighting.denoisingTechnique = 0
+rtx.directLighting.sampledLighting.enabled = false
+rtx.raytracing.subpixel.mode = 0
 rtx.sceneDb.ambientLightIntensity = 1.0
-# rtx.shadows.enabled = false
+rtx.shadows.enabled = false
 
 # Avoids replicator warning
 rtx.pathtracing.maxSamplesPerLaunch = 1000000
@@ -116,6 +120,8 @@ interceptSysStdOutput = false
 logSysStdOutput = false
 
 [settings.app.renderer]
+resolution.height = 720
+resolution.width = 1280
 skipWhileMinimized = false
 sleepMsOnFocus = 0
 sleepMsOutOfFocus = 0
