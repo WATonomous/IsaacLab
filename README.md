@@ -72,7 +72,7 @@ or run a script:
 On your local machine, open the SSH tunnel:
 
 ```bash
-ssh -L 5900:localhost:5900 asd-dev-session
+ssh -L 5900:localhost:5901 asd-dev-session
 ```
 
 Then open TurboVNC Viewer and connect to:

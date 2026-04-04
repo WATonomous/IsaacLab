@@ -103,7 +103,7 @@ services:
     volumes: *default-isaac-lab-volumes
     deploy: *default-isaac-lab-deploy
     ports:
-      - "5900:5900"
+      - "5901:5900"
     # This is the entrypoint for the container
     entrypoint: /workspace/isaaclab/docker/start-turbovnc.sh
     stdin_open: true
@@ -133,7 +133,7 @@ services:
     volumes: *default-isaac-lab-volumes
     deploy: *default-isaac-lab-deploy
     ports:
-      - "5900:5900"
+      - "5901:5900"
     # This is the entrypoint for the container
     entrypoint: /workspace/isaaclab/docker/start-turbovnc.sh
     stdin_open: true
