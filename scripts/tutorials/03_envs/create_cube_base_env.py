@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# Copyright (c) 2022-2026, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -56,11 +56,10 @@ import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, RigidObject, RigidObjectCfg
 from isaaclab.envs import ManagerBasedEnv, ManagerBasedEnvCfg
-from isaaclab.managers import ActionTerm, ActionTermCfg
+from isaaclab.managers import ActionTerm, ActionTermCfg, SceneEntityCfg
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import SceneEntityCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
@@ -304,6 +303,7 @@ class CubeEnvCfg(ManagerBasedEnvCfg):
         self.sim.dt = 0.01
         self.sim.physics_material = self.scene.terrain.physics_material
         self.sim.render_interval = 2  # render interval should be a multiple of decimation
+        self.sim.device = args_cli.device
         # viewer settings
         self.viewer.eye = (5.0, 5.0, 5.0)
         self.viewer.lookat = (0.0, 0.0, 2.0)
@@ -313,7 +313,8 @@ def main():
     """Main function."""
 
     # setup base environment
-    env = ManagerBasedEnv(cfg=CubeEnvCfg())
+    env_cfg = CubeEnvCfg()
+    env = ManagerBasedEnv(cfg=env_cfg)
 
     # setup target position commands
     target_position = torch.rand(env.num_envs, 3, device=env.device) * 2

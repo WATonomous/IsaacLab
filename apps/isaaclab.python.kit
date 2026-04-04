@@ -5,7 +5,7 @@
 [package]
 title = "Isaac Lab Python"
 description = "An app for running Isaac Lab"
-version = "2.0.2"
+version = "2.3.2"
 
 # That makes it browsable in UI with "experience" filter
 keywords = ["experience", "app", "usd"]
@@ -24,12 +24,9 @@ keywords = ["experience", "app", "usd"]
 "isaacsim.gui.menu" = {}
 "isaacsim.gui.property" = {}
 "isaacsim.replicator.behavior" = {}
-"isaacsim.robot_motion.lula" = {}
-"isaacsim.robot_motion.motion_generation" = {}
 "isaacsim.robot.manipulators" = {}
 "isaacsim.robot.policy.examples" = {}
 "isaacsim.robot.schema" = {}
-"isaacsim.robot.surface_gripper" = {}
 "isaacsim.robot.wheeled_robots" = {}
 "isaacsim.sensors.camera" = {}
 "isaacsim.sensors.physics" = {}
@@ -41,7 +38,7 @@ keywords = ["experience", "app", "usd"]
 
 # Isaac Sim Extra
 "isaacsim.asset.importer.mjcf" = {}
-"isaacsim.asset.importer.urdf" = {}
+"isaacsim.asset.importer.urdf" = {version = "2.4.31", exact = true}
 "omni.physx.bundle" = {}
 "omni.physx.tensors" = {}
 "omni.replicator.core" = {}
@@ -59,7 +56,6 @@ keywords = ["experience", "app", "usd"]
 "omni.graph.ui_nodes" = {}
 "omni.hydra.engine.stats" = {}
 "omni.hydra.rtx" = {}
-"omni.kit.loop" = {}
 "omni.kit.mainwindow" = {}
 "omni.kit.manipulator.camera" = {}
 "omni.kit.manipulator.prim" = {}
@@ -67,15 +63,13 @@ keywords = ["experience", "app", "usd"]
 "omni.kit.material.library" = {}
 "omni.kit.menu.common" = { order = 1000 }
 "omni.kit.menu.create" = {}
-"omni.kit.menu.edit" = {}
-"omni.kit.menu.file" = {}
 "omni.kit.menu.stage" = {}
 "omni.kit.menu.utils" = {}
 "omni.kit.primitive.mesh" = {}
 "omni.kit.property.bundle" = {}
 "omni.kit.raycast.query" = {}
-"omni.kit.stage_template.core" = {}
 "omni.kit.stagerecorder.bundle" = {}
+"omni.kit.stage_template.core" = {}
 "omni.kit.telemetry" = {}
 "omni.kit.tool.asset_importer" = {}
 "omni.kit.tool.collect" = {}
@@ -90,10 +84,11 @@ keywords = ["experience", "app", "usd"]
 "omni.kit.window.console" = {}
 "omni.kit.window.content_browser" = {}
 "omni.kit.window.property" = {}
+"omni.kit.window.script_editor" = {}
 "omni.kit.window.stage" = {}
 "omni.kit.window.status_bar" = {}
 "omni.kit.window.toolbar" = {}
-"omni.physx.stageupdate" = {}
+"omni.physics.stageupdate" = {}
 "omni.rtx.settings.core" = {}
 "omni.uiaudio" = {}
 "omni.usd.metrics.assembler.ui" = {}
@@ -119,7 +114,7 @@ exts."omni.kit.material.library".ui_show_list = [
     "USD Preview Surface",
 ]
 exts."omni.kit.renderer.core".present.enabled = false # Fixes MGPU stability issue
-exts."omni.kit.viewport.window".windowMenu.entryCount = 2 # Allow user to create two viewports by default
+exts."omni.kit.viewport.window".windowMenu.entryCount = 1 # Keep a single viewport for lighter interactive sessions
 exts."omni.kit.viewport.window".windowMenu.label = "" # Put Viewport menuitem under Window menu
 exts."omni.rtx.window.settings".window_menu = "Window" # Where to put the render settings menuitem
 exts."omni.usd".locking.onClose = false # reduce time it takes to close/create stage
@@ -127,10 +122,28 @@ renderer.asyncInit = true # Don't block while renderer inits
 renderer.gpuEnumeration.glInterop.enabled = false # Improves startup speed.
 rendergraph.mgpu.backend = "copyQueue" # In MGPU configurations, This setting can be removed if IOMMU is disabled for better performance, copyQueue improves stability and performance when IOMMU is enabled
 rtx-transient.dlssg.enabled = false # DLSSG frame generation is not compatible with synthetic data generation
-rtx.hydra.mdlMaterialWarmup = true # start loading the MDL shaders needed before any delegate is actually created.
+rtx-transient.dldenoiser.enabled = false
+rtx.hydra.mdlMaterialWarmup = false # avoid front-loading shader warmup for remote interactive sessions
+rtx.translucency.enabled = false
+rtx.reflections.enabled = false
+rtx.reflections.denoiser.enabled = false
+rtx.indirectDiffuse.enabled = false
+rtx.indirectDiffuse.denoiser.enabled = false
+rtx.ambientOcclusion.enabled = false
+rtx.ambientOcclusion.denoiserMode = 1
+rtx.directLighting.sampledLighting.enabled = false
+rtx.directLighting.sampledLighting.denoisingTechnique = 0
+rtx.raytracing.subpixel.mode = 0
+rtx.raytracing.cached.enabled = false
+rtx.post.dlss.execMode = 0 # performance
+rtx.shadows.enabled = false
+renderer.multiGpu.maxGpuCount = 1
 omni.replicator.asyncRendering = false # Async rendering must be disabled for SDG
 exts."omni.kit.test".includeTests = ["*isaac*"] # Add isaac tests to test runner
 foundation.verifyOsVersion.enabled = false
+
+# disable the metrics assembler change listener, we don't want to do any runtime changes
+metricsAssembler.changeListenerEnabled = false
 
 # set the default ros bridge to disable on startup
 isaac.startup.ros_bridge_extension = ""
@@ -163,14 +176,14 @@ show_menu_titles = true
 
 [settings.app]
 name = "Isaac-Sim"
-version = "4.5.0"
+version = "5.1.0"
 versionFile = "${exe-path}/VERSION"
 content.emptyStageOnStart = true
 fastShutdown = true
 file.ignoreUnsavedOnExit = true
 font.file = "${fonts}/OpenSans-SemiBold.ttf"
 font.size = 16
-gatherRenderResults = true # True to prevent artifacts in multiple viewport configurations, can be set to false for better performance in some cases
+gatherRenderResults = false # prefer lower latency over multi-viewport correctness for remote use
 hangDetector.enabled = true
 hangDetector.timeout = 120
 player.useFixedTimeStepping = true
@@ -203,8 +216,8 @@ defaultCamPos.x = 5
 defaultCamPos.y = 5
 defaultCamPos.z = 5
 defaults.fillViewport = false # default to not fill viewport
-grid.enabled = true
-outline.enabled = true
+grid.enabled = false
+outline.enabled = false
 boundingBoxes.enabled = false
 show.camera=false
 show.lights=false
@@ -243,6 +256,10 @@ omni.replicator.asyncRendering = false
 app.asyncRendering = false
 app.asyncRenderingLowLatency = false
 
+### FSD
+app.useFabricSceneDelegate = true
+rtx.hydra.readTransformsFromFabricInRenderDelegate = true
+
 # disable replicator orchestrator for better runtime perf
 exts."omni.replicator.core".Orchestrator.enabled = false
 
@@ -253,7 +270,7 @@ outDirectory = "${data}"
 ###############################
 [settings.exts."omni.kit.registry.nucleus"]
 registries = [
-    { name = "kit/default", url = "https://ovextensionsprod.blob.core.windows.net/exts/kit/prod/106/shared" },
+    { name = "kit/default", url = "https://ovextensionsprod.blob.core.windows.net/exts/kit/prod/107/shared" },
     { name = "kit/sdk", url = "https://ovextensionsprod.blob.core.windows.net/exts/kit/prod/sdk/${kit_version_short}/${kit_git_hash}" },
     { name = "kit/community", url = "https://dw290v42wisod.cloudfront.net/exts/kit/community" },
 ]
@@ -293,11 +310,13 @@ fabricUpdateTransformations = false
 fabricUpdateVelocities = false
 fabricUpdateForceSensors = false
 fabricUpdateJointStates = false
+### When Direct GPU mode is enabled (suppressReadback=true) use direct interop between PhysX GPU and Fabric
+fabricUseGPUInterop = true
 
 # Asset path
 # set the S3 directory manually to the latest published S3
 # note: this is done to ensure prior versions of Isaac Sim still use the latest assets
 [settings]
-persistent.isaac.asset_root.default = "http://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5"
-persistent.isaac.asset_root.cloud = "http://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5"
-persistent.isaac.asset_root.nvidia = "http://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5"
+persistent.isaac.asset_root.default = "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1"
+persistent.isaac.asset_root.cloud = "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1"
+persistent.isaac.asset_root.nvidia = "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1"

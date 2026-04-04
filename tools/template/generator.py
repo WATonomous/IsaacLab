@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# Copyright (c) 2022-2026, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 import jinja2
-from common import ROOT_DIR, TASKS_DIR, TEMPLATE_DIR
+from common import MULTI_AGENT_ALGORITHMS, ROOT_DIR, SINGLE_AGENT_ALGORITHMS, TASKS_DIR, TEMPLATE_DIR
 
 jinja_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(TEMPLATE_DIR),
@@ -96,22 +96,22 @@ def _generate_task_per_workflow(task_dir: str, specification: dict) -> None:
     # workflow-specific content
     if task_spec["workflow"]["name"] == "direct":
         # - task/*env_cfg.py
-        template = jinja_env.get_template(f'tasks/direct_{task_spec["workflow"]["type"]}/env_cfg')
+        template = jinja_env.get_template(f"tasks/direct_{task_spec['workflow']['type']}/env_cfg")
         _write_file(
-            os.path.join(task_dir, f'{task_spec["filename"]}_env_cfg.py'), content=template.render(**specification)
+            os.path.join(task_dir, f"{task_spec['filename']}_env_cfg.py"), content=template.render(**specification)
         )
         # - task/*env.py
-        template = jinja_env.get_template(f'tasks/direct_{task_spec["workflow"]["type"]}/env')
-        _write_file(os.path.join(task_dir, f'{task_spec["filename"]}_env.py'), content=template.render(**specification))
+        template = jinja_env.get_template(f"tasks/direct_{task_spec['workflow']['type']}/env")
+        _write_file(os.path.join(task_dir, f"{task_spec['filename']}_env.py"), content=template.render(**specification))
     elif task_spec["workflow"]["name"] == "manager-based":
         # - task/*env_cfg.py
-        template = jinja_env.get_template(f'tasks/manager-based_{task_spec["workflow"]["type"]}/env_cfg')
+        template = jinja_env.get_template(f"tasks/manager-based_{task_spec['workflow']['type']}/env_cfg")
         _write_file(
-            os.path.join(task_dir, f'{task_spec["filename"]}_env_cfg.py'), content=template.render(**specification)
+            os.path.join(task_dir, f"{task_spec['filename']}_env_cfg.py"), content=template.render(**specification)
         )
         # - task/mdp folder
         shutil.copytree(
-            os.path.join(TEMPLATE_DIR, "tasks", f'manager-based_{task_spec["workflow"]["type"]}', "mdp"),
+            os.path.join(TEMPLATE_DIR, "tasks", f"manager-based_{task_spec['workflow']['type']}", "mdp"),
             os.path.join(task_dir, "mdp"),
             dirs_exist_ok=True,
         )
@@ -161,9 +161,10 @@ def _external(specification: dict) -> None:
     # repo files
     print("  |-- Copying repo files...")
     shutil.copyfile(os.path.join(ROOT_DIR, ".dockerignore"), os.path.join(project_dir, ".dockerignore"))
-    shutil.copyfile(os.path.join(ROOT_DIR, ".flake8"), os.path.join(project_dir, ".flake8"))
+    shutil.copyfile(os.path.join(ROOT_DIR, "pyproject.toml"), os.path.join(project_dir, "pyproject.toml"))
     shutil.copyfile(os.path.join(ROOT_DIR, ".gitattributes"), os.path.join(project_dir, ".gitattributes"))
-    shutil.copyfile(os.path.join(ROOT_DIR, ".gitignore"), os.path.join(project_dir, ".gitignore"))
+    if os.path.exists(os.path.join(ROOT_DIR, ".gitignore")):
+        shutil.copyfile(os.path.join(ROOT_DIR, ".gitignore"), os.path.join(project_dir, ".gitignore"))
     shutil.copyfile(
         os.path.join(ROOT_DIR, ".pre-commit-config.yaml"), os.path.join(project_dir, ".pre-commit-config.yaml")
     )
@@ -183,10 +184,12 @@ def _external(specification: dict) -> None:
         # replace placeholder in scripts
         for file in glob.glob(os.path.join(dir, rl_library["name"], "*.py")):
             _replace_in_file(
-                [(
-                    "# PLACEHOLDER: Extension template (do not remove this comment)",
-                    f"import {name}.tasks  # noqa: F401",
-                )],
+                [
+                    (
+                        "# PLACEHOLDER: Extension template (do not remove this comment)",
+                        f"import {name}.tasks  # noqa: F401",
+                    )
+                ],
                 src=file,
             )
     # - other scripts
@@ -195,6 +198,17 @@ def _external(specification: dict) -> None:
         src=os.path.join(ROOT_DIR, "scripts", "environments", "list_envs.py"),
         dst=os.path.join(dir, "list_envs.py"),
     )
+    for script in ["zero_agent.py", "random_agent.py"]:
+        _replace_in_file(
+            [
+                (
+                    "# PLACEHOLDER: Extension template (do not remove this comment)",
+                    f"import {name}.tasks  # noqa: F401",
+                )
+            ],
+            src=os.path.join(ROOT_DIR, "scripts", "environments", script),
+            dst=os.path.join(dir, script),
+        )
     # # docker files
     # print("  |-- Copying docker files...")
     # dir = os.path.join(project_dir, "docker")
@@ -258,6 +272,28 @@ def _external(specification: dict) -> None:
     print(f"Project '{name}' generated successfully in {project_dir} path.")
     print(f"See {project_dir}/README.md to get started!")
     print("-" * 80)
+
+
+def get_algorithms_per_rl_library(single_agent: bool = True, multi_agent: bool = True):
+    assert single_agent or multi_agent, "At least one of 'single_agent' or 'multi_agent' must be True"
+    data = {"rl_games": [], "rsl_rl": [], "skrl": [], "sb3": []}
+    # get algorithms
+    for file in glob.glob(os.path.join(TEMPLATE_DIR, "agents", "*_cfg")):
+        for rl_library in data.keys():
+            basename = os.path.basename(file).replace("_cfg", "")
+            if basename.startswith(f"{rl_library}_"):
+                algorithm = basename.replace(f"{rl_library}_", "").upper()
+                assert algorithm in SINGLE_AGENT_ALGORITHMS or algorithm in MULTI_AGENT_ALGORITHMS, (
+                    f"{algorithm} algorithm is not listed in the supported algorithms"
+                )
+                if single_agent and algorithm in SINGLE_AGENT_ALGORITHMS:
+                    data[rl_library].append(algorithm)
+                if multi_agent and algorithm in MULTI_AGENT_ALGORITHMS:
+                    data[rl_library].append(algorithm)
+    # remove duplicates and sort
+    for rl_library in data.keys():
+        data[rl_library] = sorted(list(set(data[rl_library])))
+    return data
 
 
 def generate(specification: dict) -> None:

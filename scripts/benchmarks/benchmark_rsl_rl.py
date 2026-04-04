@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# Copyright (c) 2022-2026, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -32,6 +32,9 @@ parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument("--seed", type=int, default=42, help="Seed used for the environment")
 parser.add_argument("--max_iterations", type=int, default=10, help="RL Policy training iterations.")
 parser.add_argument(
+    "--distributed", action="store_true", default=False, help="Run training with multiple GPUs or nodes."
+)
+parser.add_argument(
     "--benchmark_backend",
     type=str,
     default="OmniPerfKPIFile",
@@ -63,16 +66,16 @@ app_start_time_end = time.perf_counter_ns()
 
 imports_time_begin = time.perf_counter_ns()
 
+from datetime import datetime
+
 import gymnasium as gym
 import numpy as np
 import torch
-from datetime import datetime
-
 from rsl_rl.runners import OnPolicyRunner
 
 from isaaclab.envs import DirectMARLEnvCfg, DirectRLEnvCfg, ManagerBasedRLEnvCfg
 from isaaclab.utils.dict import print_dict
-from isaaclab.utils.io import dump_pickle, dump_yaml
+from isaaclab.utils.io import dump_yaml
 
 from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper
 
@@ -88,6 +91,7 @@ enable_extension("isaacsim.benchmark.services")
 from isaacsim.benchmark.services import BaseIsaacBenchmark
 
 from isaaclab.utils.timer import Timer
+
 from scripts.benchmarks.utils import (
     log_app_start_time,
     log_python_imports_time,
@@ -126,8 +130,37 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     """Train with RSL-RL agent."""
     # parse configuration
     benchmark.set_phase("loading", start_recording_frametime=False, start_recording_runtime=True)
+    # override configurations with non-hydra CLI arguments
     agent_cfg = cli_args.update_rsl_rl_cfg(agent_cfg, args_cli)
     env_cfg.scene.num_envs = args_cli.num_envs if args_cli.num_envs is not None else env_cfg.scene.num_envs
+    agent_cfg.max_iterations = (
+        args_cli.max_iterations if args_cli.max_iterations is not None else agent_cfg.max_iterations
+    )
+
+    # set the environment seed
+    # note: certain randomizations occur in the environment initialization so we set the seed here
+    env_cfg.seed = agent_cfg.seed
+    env_cfg.sim.device = args_cli.device if args_cli.device is not None else env_cfg.sim.device
+    # check for invalid combination of CPU device with distributed training
+    if args_cli.distributed and args_cli.device is not None and "cpu" in args_cli.device:
+        raise ValueError(
+            "Distributed training is not supported when using CPU device. "
+            "Please use GPU device (e.g., --device cuda) for distributed training."
+        )
+
+    # multi-gpu training configuration
+    world_rank = 0
+    world_size = 1
+    if args_cli.distributed:
+        env_cfg.sim.device = f"cuda:{app_launcher.local_rank}"
+        agent_cfg.device = f"cuda:{app_launcher.local_rank}"
+
+        # set seed to have diversity in different threads
+        seed = agent_cfg.seed + app_launcher.local_rank
+        env_cfg.seed = seed
+        agent_cfg.seed = seed
+        world_rank = app_launcher.global_rank
+        world_size = int(os.getenv("WORLD_SIZE", 1))
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
@@ -181,42 +214,45 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # dump the configuration into log-directory
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)
     dump_yaml(os.path.join(log_dir, "params", "agent.yaml"), agent_cfg)
-    dump_pickle(os.path.join(log_dir, "params", "env.pkl"), env_cfg)
-    dump_pickle(os.path.join(log_dir, "params", "agent.pkl"), agent_cfg)
 
     benchmark.set_phase("sim_runtime")
 
     # run training
     runner.learn(num_learning_iterations=agent_cfg.max_iterations, init_at_random_ep_len=True)
 
-    benchmark.store_measurements()
+    if world_rank == 0:
+        benchmark.store_measurements()
 
-    # parse tensorboard file stats
-    log_data = parse_tf_logs(log_dir)
+        # parse tensorboard file stats
+        log_data = parse_tf_logs(log_dir)
 
-    # prepare RL timing dict
-    collection_fps = (
-        1 / (np.array(log_data["Perf/collection time"])) * env.unwrapped.num_envs * agent_cfg.num_steps_per_env
-    )
-    rl_training_times = {
-        "Collection Time": (np.array(log_data["Perf/collection time"]) / 1000).tolist(),
-        "Learning Time": (np.array(log_data["Perf/learning_time"]) / 1000).tolist(),
-        "Collection FPS": collection_fps.tolist(),
-        "Total FPS": log_data["Perf/total_fps"],
-    }
+        # prepare RL timing dict
+        collection_fps = (
+            1
+            / (np.array(log_data["Perf/collection time"]))
+            * env.unwrapped.num_envs
+            * agent_cfg.num_steps_per_env
+            * world_size
+        )
+        rl_training_times = {
+            "Collection Time": (np.array(log_data["Perf/collection time"]) / 1000).tolist(),
+            "Learning Time": (np.array(log_data["Perf/learning_time"]) / 1000).tolist(),
+            "Collection FPS": collection_fps.tolist(),
+            "Total FPS": log_data["Perf/total_fps"] * world_size,
+        }
 
-    # log additional metrics to benchmark services
-    log_app_start_time(benchmark, (app_start_time_end - app_start_time_begin) / 1e6)
-    log_python_imports_time(benchmark, (imports_time_end - imports_time_begin) / 1e6)
-    log_task_start_time(benchmark, (task_startup_time_end - task_startup_time_begin) / 1e6)
-    log_scene_creation_time(benchmark, Timer.get_timer_info("scene_creation") * 1000)
-    log_simulation_start_time(benchmark, Timer.get_timer_info("simulation_start") * 1000)
-    log_total_start_time(benchmark, (task_startup_time_end - app_start_time_begin) / 1e6)
-    log_runtime_step_times(benchmark, rl_training_times, compute_stats=True)
-    log_rl_policy_rewards(benchmark, log_data["Train/mean_reward"])
-    log_rl_policy_episode_lengths(benchmark, log_data["Train/mean_episode_length"])
+        # log additional metrics to benchmark services
+        log_app_start_time(benchmark, (app_start_time_end - app_start_time_begin) / 1e6)
+        log_python_imports_time(benchmark, (imports_time_end - imports_time_begin) / 1e6)
+        log_task_start_time(benchmark, (task_startup_time_end - task_startup_time_begin) / 1e6)
+        log_scene_creation_time(benchmark, Timer.get_timer_info("scene_creation") * 1000)
+        log_simulation_start_time(benchmark, Timer.get_timer_info("simulation_start") * 1000)
+        log_total_start_time(benchmark, (task_startup_time_end - app_start_time_begin) / 1e6)
+        log_runtime_step_times(benchmark, rl_training_times, compute_stats=True)
+        log_rl_policy_rewards(benchmark, log_data["Train/mean_reward"])
+        log_rl_policy_episode_lengths(benchmark, log_data["Train/mean_episode_length"])
 
-    benchmark.stop()
+        benchmark.stop()
 
     # close the simulator
     env.close()
