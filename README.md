@@ -40,10 +40,10 @@ Isaac Lab offers a comprehensive set of tools and environments designed to facil
 
 ### WatCloud + TurboVNC
 
-For WatCloud / Slurm usage, the minimum interactive workflow is:
+For WatCloud / Slurm usage, the simplest interactive workflow is:
 
-1. Start your Slurm dev session so `asd-dev-session` lands on the active compute node.
-2. Install TurboVNC Viewer on your local machine.
+1. Install TurboVNC Viewer on your local machine.
+2. Start your Slurm dev session so `asd-dev-session` lands on the active compute node.
 3. Build and start the Isaac Lab Docker container on the Slurm node.
 4. Forward local port `5900` to the Slurm node through `asd-dev-session`.
 5. Connect TurboVNC Viewer to `localhost:5900`.
