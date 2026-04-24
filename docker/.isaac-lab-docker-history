@@ -1,0 +1,105 @@
+echo "$DISPLAY"
+ss -ltnp | egrep ':5900|:5901'
+netstat -ltnp 2>/dev/null | egrep ':5900|:5901'
+lsof -nP -iTCP -sTCP:LISTEN | egrep '5900|5901'
+echo "$DISPLAY"
+./isaaclab.sh -s
+exit
+./isaaclab.sh -s
+exit
+./isaaclab.sh -s
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+ls
+cd ..
+ls
+./isaaclab.sh -i
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py
+exit
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py
+./isaaclab.sh -p -m pip install flatdict==4.0.1
+./isaaclab.sh -p -m pip install "setuptools<81" wheel
+./isaaclab.sh -p -m pip install "packaging<24"
+./isaaclab.sh -p -m pip install --no-build-isolation flatdict==4.0.1
+/workspace/isaaclab/_isaac_sim/python.sh -m ensurepip --upgrade
+/workspace/isaaclab/_isaac_sim/python.sh -m pip install --upgrade "pip<25" "setuptools<81" "wheel" "packaging<24"
+/workspace/isaaclab/_isaac_sim/python.sh -m ensurepip --upgrade
+exit
+./isaaclab.sh -p scripts/tutorials/05_controllers/run_diff_ik.py 
+./isaaclab.sh -s
+clear
+./isaaclab.sh -p scripts/tutorials/05_controllers/run_diff_ik.py 
+ls
+export PYTHONPATH="/workspace/isaaclab/source/isaaclab:/workspace/isaaclab/source/isaaclab_assets:/workspace/isaaclab/source/isaaclab_tasks:/workspace/isaaclab/source/isaaclab_rl:/workspace/isaaclab/source/isaaclab_mimic:/workspace/isaaclab/source/isaaclab_contrib${PYTHONPATH:+:$PYTHONPATH}"
+./isaaclab.sh -p /workspace/isaaclab/scripts/tutorials/05_controllers/run_diff_ik.py
+./isaaclab.sh -p scripts/tutorials/05_controllers/run_diff_ik.py 
+exit
+./isaaclab.sh -s
+clear
+./isaaclab.sh -p scripts/tutorials/05_controllers/run_diff_ik.py 
+clear
+./isaaclab.sh -p scripts/tutorials/05_controllers/run_diff_ik.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+clear
+cat /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/task_space_controller.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ik_isaac_sim_debug.py 
+./isaaclab.sh -p -m pip install mujoco
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ik_isaac_sim_debug.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ik_isaac_sim_debug.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/mujoco_fingertip_ik_isaac_sim_debug.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/mujoco_fingertip_ik_isaac_sim.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/diff_ik_task_space_controller.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/mujoco_fingertip_ik_isaac_sim.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/diff_ik_task_space_controller.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/mujoco_fingertip_ik_isaac_sim.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/mujoco_fingertip_ik_isaac_sim.py 
+./isaaclab.sh -s
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/mujoco_fingertip_ik_isaac_sim.py 
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/mujoco_fingertip_ik_isaac_sim.py 
+./isaaclab.sh -s
+cclear
+clear
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/reach/env_cfg.py 
+PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato \
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/reach/env_cfg.py
+PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato/HumanoidRL \
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/reach/env_cfg.py
+cd /workspace/isaaclab
+PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato \
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/reach/env_cfg.py
+export PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/reach/env_cfg.py
+./isaaclab.sh -s
+cd /workspace/isaaclab
+PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato:/workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL ./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/debug_reach_scene.py
+cd /workspace/isaaclab
+PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato:/workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL ./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/debug_reach_env.py --num_envs 4
+cd /workspace/isaaclab
+PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato:/workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL ./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/debug_reach_env.py --num_envs 4
+PYTHONPATH=/workspace/humanoid/autonomy/simulation/Humanoid_Wato:/workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL ./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/debug_registered_env.py --num_envs 4
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/lessons/lesson_03_actions_observations/debug_env.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/lessons/lesson_05_resets_debug/debug_env.py 
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/lessons/lesson_08_training_playback/train.py --task Lesson8-ARM-Reach-v0 --num_envs 4 --max_iterations 1 --headless
+ls
+cd ..
+ls
+cd humanoid/
+ls
+find logs/rsl_rl -name "*.pt"
+cd ..
+cd isaaclab/
+./isaaclab.sh -p /workspace/humanoid/autonomy/simulation/Humanoid_Wato/ARM_RL/lessons/lesson_08_training_playback/train.py   --task Lesson8-ARM-Reach-v0   --num_envs 512   --max_iterations 24   --headless
